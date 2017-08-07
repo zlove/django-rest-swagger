@@ -10,6 +10,26 @@ import simplejson as json
 from .settings import swagger_settings
 
 
+# Based on: https://stackoverflow.com/a/7205107
+def merge_dicts(a, b, force=False, path=None):
+    """Merge dict b into dict a, handling nested dictionaries"""
+    if path is None: path = []
+    for key in b:
+        if key in a:
+            if isinstance(a[key], dict) and isinstance(b[key], dict):
+                merge_dicts(a[key], b[key], force, path + [str(key)])
+            elif a[key] == b[key]:
+                pass  # same leaf value
+            else:
+                if force:
+                    a[key] = b[key]
+                else:
+                    raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
+        else:
+            a[key] = b[key]
+    return a
+
+
 class OpenAPICodec(_OpenAPICodec):
     def encode(self, document, extra=None, **options):
         if not isinstance(document, coreapi.Document):
@@ -17,7 +37,7 @@ class OpenAPICodec(_OpenAPICodec):
 
         data = generate_swagger_object(document)
         if isinstance(extra, dict):
-            data.update(extra)
+            merge_dicts(data, extra, force=True)
 
         return force_bytes(json.dumps(data))
 
