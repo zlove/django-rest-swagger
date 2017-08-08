@@ -25,6 +25,9 @@ DEFAULTS = {
         'patch'
     ],
     'VALIDATOR_URL': '',
+    'REDOC_HIDE_HOSTNAME': True,
+    'REDOC_UNTRUSTED_SPEC': False,
+    'REDOC_PATH_IN_MIDDLE_PANEL': False
 }
 
 IMPORT_STRINGS = []

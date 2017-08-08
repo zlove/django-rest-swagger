@@ -108,3 +108,42 @@ class SwaggerUIRenderer(BaseRenderer):
             data['validatorUrl'] = swagger_settings.VALIDATOR_URL
 
         return data
+
+
+class SwaggerRedocRenderer(BaseRenderer):
+    media_type = 'text/html'
+    format = 'swagger'
+    template = 'rest_framework_swagger/index_redoc.html'
+    charset = 'utf-8'
+
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        self.set_context(renderer_context)
+        return render(
+            renderer_context['request'],
+            self.template,
+            renderer_context
+        )
+
+    def set_context(self, renderer_context):
+        renderer_context['USE_SESSION_AUTH'] = \
+            swagger_settings.USE_SESSION_AUTH
+        renderer_context.update(self.get_auth_urls())
+        renderer_context.update(self.get_redoc_settings())
+
+    def get_auth_urls(self):
+        urls = {}
+        if swagger_settings.LOGIN_URL is not None:
+            urls['LOGIN_URL'] = resolve_url(swagger_settings.LOGIN_URL)
+        if swagger_settings.LOGOUT_URL is not None:
+            urls['LOGOUT_URL'] = resolve_url(swagger_settings.LOGOUT_URL)
+
+        return urls
+
+    def get_redoc_settings(self):
+        data = {
+            'REDOC_HIDE_HOSTNAME': swagger_settings.REDOC_HIDE_HOSTNAME,
+            'REDOC_UNTRUSTED_SPEC': swagger_settings.REDOC_UNTRUSTED_SPEC,
+            'REDOC_PATH_IN_MIDDLE_PANEL': swagger_settings.REDOC_PATH_IN_MIDDLE_PANEL,
+        }
+
+        return data

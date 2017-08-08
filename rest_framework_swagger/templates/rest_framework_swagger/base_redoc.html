@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{title|default:'API Docs'}}</title>
+    <!-- needed for adaptive design -->
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        .apidoc_header {
+            height: 36px;
+            box-sizing: border-box;
+            padding: 8px 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1;
+            background: #FFF;
+            font-family: "Helvetic Neue", Helvetica, sans-serif;
+            border-bottom: 1px solid #F5F5F5;
+            box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.12);
+        }
+        .apidoc_header_action {
+            float: right;
+        }
+        .apidoc_header .btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: 3px 8px;
+            text-transform: uppercase;
+            font-size: 14px;
+            cursor: pointer;
+            color: #0033a0;
+        }
+        .apidoc_header .btn:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+
+    {% block extra_styles %}
+        {# -- Add any additional CSS scripts here -- #}
+    {% endblock %}
+</head>
+<body>
+<header class="apidoc_header">
+    {% if USE_SESSION_AUTH %}
+        <div class="apidoc_header_action">
+            {% if request.user.is_authenticated %}
+                <a class="btn" href="{{ LOGOUT_URL }}?next={{ request.path }}">Logout</a>
+            {% else %}
+                <a class="btn" href="{{ LOGIN_URL }}?next={{ request.path }}">Login</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</header>
+<redoc
+        spec-url='{{SPEC_URL|default:"?format=openapi"}}'
+        scroll-y-offset='.apidoc_header'
+        {% if REDOC_HIDE_HOSTNAME %}hide-hostname{% endif %}
+        {% if REDOC_UNTRUSTED_SPEC %}untrusted-spec{% endif %}
+        {% if REDOC_PATH_IN_MIDDLE_PANEL %}path-in-middle-panel{% endif %}
+></redoc>
+
+<script src="https://rebilly.github.io/ReDoc/releases/latest/redoc.min.js"> </script>
+
+{% block extra_scripts %}
+    {# -- Add any additional custom JS scripts here -- #}
+{% endblock %}
+</body>
+</html>
+
